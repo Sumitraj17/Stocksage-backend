@@ -87,12 +87,10 @@ const adminLogin = async (req, res) => {
 
   jwt.sign({ id: isUser._id }, process.env.SECRET_KEY, async (err, token) => {
     if (err)
-      return res
-        .status(500)
-        .json({
-          status: "Internal Server Error",
-          message: "Something went wrong",
-        });
+      return res.status(500).json({
+        status: "Internal Server Error",
+        message: "Something went wrong",
+      });
 
     isUser.refreshToken = token;
     const user = await Company.findById(isUser._id).select(
@@ -119,4 +117,59 @@ const addEmployee = async (req, res) => {
     .json({ status: "Success", message: "Working", user: req.user });
 };
 
-export { adminRegister, adminLogin, addEmployee };
+const changePassword = async (req, res) => {
+  try {
+    const user = req.user;
+    const { Password } = req.body;
+    const hashedPassword = await hashPassword(Password);
+    await Company.findByIdAndUpdate(
+      user._id,
+      {
+        $set: {
+          Password: hashedPassword,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res
+      .status(200)
+      .json({ status: "Success", message: "Password changed successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      status: "Internal server error",
+      message: "Something went wrong",
+    });
+  }
+};
+
+const adminLogout = async (req, res) => {
+  try {
+    const user = req.user;
+    await Company.findByIdAndUpdate(
+      user._id,
+      {
+        $set: {
+          refreshToken: undefined,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+
+    return res
+      .status(200)
+      .clearCookie("accessToken", { httpOnly: true, secure: true })
+      .json({ status: "Success", message: "User logged out Successfully" });
+  } catch (error) {
+    return res.status(500).json({
+      status: "Internal server error",
+      message: "Something went wrong",
+    });
+  }
+};
+
+export { adminRegister, adminLogin, addEmployee, adminLogout, changePassword };
