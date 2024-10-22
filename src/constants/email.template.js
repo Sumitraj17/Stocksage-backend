@@ -14,6 +14,7 @@ If you have any questions or need assistance with your account, feel free to rea
 
 Thank you for choosing StockSage to manage your company's inventory and demand forecasting needs. We look forward to supporting your business growth!
 
+
 Best regards,
 The StockSage Team
 stocksage2024@gmail.com`;
