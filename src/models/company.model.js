@@ -2,23 +2,22 @@ import mongoose from "mongoose";
 
 const CompanySchema = new mongoose.Schema(
   {
-    CompanyName: {
+    companyName: {
       type: String,
       required: true,
       unique: true,
-      lowercase: true,
     },
-    CompanyLocation: {
+    companyLocation: {
       type: String,
       required: true,
       lowercase: true,
     },
-    AdminName: {
+    userName: {
       type: String,
       required: true,
       lowercase: true,
     },
-    AdminEmail: {
+    Email: {
       type: String, 
       required: true,
       unique: true,
@@ -38,6 +37,9 @@ const CompanySchema = new mongoose.Schema(
         ref: 'Employee', 
       },
     ],
+    refreshToken:{
+        type:String
+    }
   },
   { timestamps: true }
 );
