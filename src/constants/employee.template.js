@@ -1,7 +1,7 @@
 const employeeTemplate = (cmpName, employeeName, employeeEmail,employeePassword) => {
   let text = `Dear ${employeeName},
 
-Welcome to ${cmpName} and StockSage!
+Welcome to StockSage!
 
 You have been successfully registered as an employee. Here are your login credentials:
 

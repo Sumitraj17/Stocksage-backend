@@ -163,12 +163,14 @@ const addEmployee = async (req, res) => {
     });
   } else {
     // If user is created successfully, send email notification
-    const text = employeeTemplate(companyName, EmployeeName,EmployeeEmail,Password); 
+    const text = employeeTemplate( EmployeeName,EmployeeEmail,Password); 
     Mailer(
       EmployeeEmail,
       "Welcome to StockSage!",
       text
     );
+
+    
     
     return res.status(200).json({
       status: "Success",
