@@ -6,6 +6,7 @@ import { hashPassword, comparePassword } from "../utils/password.js"; // Passwor
 import Mailer from "../utils/mailer.js"; // Utility for sending emails
 import { adminTemplate } from "../constants/email.template.js"; // Email template for admin registration confirmation
 import { employeeTemplate } from "../constants/employee.template.js";
+import { v4 as uniqueId } from "uuid";
 
 // Admin registration function
 const adminRegister = async (req, res) => {
@@ -135,10 +136,12 @@ const adminLogin = async (req, res) => {
 
 // Add an employee function
 const addEmployee = async (req, res) => {
-  const { EmployeeName, EmployeeEmail, Password, companyId } = req.body;
+  const admin = req.user;
+  console.log(admin)
+  const { EmployeeName, EmployeeEmail} = req.body;
 
   // Check if all employee data is provided
-  if (!EmployeeName || !EmployeeEmail || !Password || !companyId) {
+  if (!EmployeeName || !EmployeeEmail) {
     return res.status(400).json({
       status: "Error",
       message: "Provide all data including company ID",
@@ -157,14 +160,15 @@ const addEmployee = async (req, res) => {
       });
     }
 
-    // Hash the employee's password
-    const hashedPassword = await hashPassword(Password);
+    // Generate Password
+    const Password = uniqueId();
 
     // Create and save the new employee object in the database
     const employee = await Employee.create({
       EmployeeName,
       EmployeeEmail,
-      Password: hashedPassword,
+      Password,
+      companyName:admin.companyName
     });
 
     // If employee creation fails, return an error response
@@ -177,11 +181,11 @@ const addEmployee = async (req, res) => {
 
     // Add employee to the company's Employees array
     const updatedCompany = await Company.findByIdAndUpdate(
-      companyId,
+      admin._id,
       { $push: { Employees: employee._id } },  // Add employee to company
       { new: true }  // Return the updated company document
     );
-
+    console.log("Updated Company",updatedCompany)
     // If adding to the company fails, return an error
     if (!updatedCompany) {
       return res.status(500).json({

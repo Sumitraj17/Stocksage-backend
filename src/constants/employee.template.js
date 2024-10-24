@@ -1,4 +1,4 @@
-const employeeTemplate = (cmpName, employeeName, employeeEmail,employeePassword) => {
+const employeeTemplate = (employeeName, employeeEmail,employeePassword) => {
   let text = `Dear ${employeeName},
 
 Welcome to StockSage!

@@ -10,7 +10,6 @@ const EmployeeSchema = new mongoose.Schema(
     EmployeeName: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
     },
     EmployeeEmail: {
@@ -27,6 +26,10 @@ const EmployeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    companyName:{
+      type:String,
+      required:true,
+    }
   },
   { timestamps: true }
 );
