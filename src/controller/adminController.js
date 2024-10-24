@@ -128,54 +128,77 @@ const adminLogin = async (req, res) => {
 
 // Add an employee function
 const addEmployee = async (req, res) => {
-  const { EmployeeName, EmployeeEmail, Password } = req.body;
+  const { EmployeeName, EmployeeEmail, Password, companyId } = req.body;
 
   // Check if all employee data is provided
-  if (!EmployeeName || !EmployeeEmail || !Password)
-    return res
-      .status(400)
-      .json({ status: "Error", message: "Provide all data" });
-
-  // Check if an employee with the same email already exists
-  const isUser = await Company.findOne({
-    $or: [{ EmployeeEmail }],
-  });
-
-  // If employee exists, return an error response
-  if (isUser)
+  if (!EmployeeName || !EmployeeEmail || !Password || !companyId) {
     return res.status(400).json({
-      status: "Bad Request",
-      message: "Employee or Email Already Exists",
-    });
-
-  // Hash the employee's password
-  const hashedPassword = await hashPassword(Password);
-
-  // Create and save the new employee object in the database
-  const user = await Employee.create({ EmployeeName, EmployeeEmail, Password: hashedPassword });
-
-  // Send email to employee
-  if (!user) {
-    // Handle the error here if the user creation fails
-    return res.status(500).json({
       status: "Error",
-      message: "Failed to create employee",
+      message: "Provide all data including company ID",
     });
-  } else {
-    // If user is created successfully, send email notification
-    const text = employeeTemplate( EmployeeName,EmployeeEmail,Password); 
-    Mailer(
+  }
+
+  try {
+    // Check if the employee with the same email already exists
+    const isUser = await Employee.findOne({ EmployeeEmail });
+
+    // If employee exists, return an error response
+    if (isUser) {
+      return res.status(400).json({
+        status: "Bad Request",
+        message: "Employee with this email already exists",
+      });
+    }
+
+    // Hash the employee's password
+    const hashedPassword = await hashPassword(Password);
+
+    // Create and save the new employee object in the database
+    const employee = await Employee.create({
+      EmployeeName,
       EmployeeEmail,
-      "Welcome to StockSage!",
-      text
+      Password: hashedPassword,
+    });
+
+    // If employee creation fails, return an error response
+    if (!employee) {
+      return res.status(500).json({
+        status: "Error",
+        message: "Failed to create employee",
+      });
+    }
+
+    // Add employee to the company's Employees array
+    const updatedCompany = await Company.findByIdAndUpdate(
+      companyId,
+      { $push: { Employees: employee._id } },  // Add employee to company
+      { new: true }  // Return the updated company document
     );
 
-    
-    
+    // If adding to the company fails, return an error
+    if (!updatedCompany) {
+      return res.status(500).json({
+        status: "Error",
+        message: "Failed to add employee to the company",
+      });
+    }
+
+    // Send email notification to the new employee
+    const text = employeeTemplate(EmployeeName, EmployeeEmail, Password);
+    Mailer(EmployeeEmail, "Welcome to StockSage!", text);
+
+    // Return success response
     return res.status(200).json({
       status: "Success",
-      message: "Employee created and email sent",
-      user
+      message: "Employee created, added to company, and email sent",
+      employee,
+      updatedCompany
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: "Error",
+      message: "Something went wrong",
     });
   }
 };
