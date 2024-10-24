@@ -1,4 +1,5 @@
 import { Company } from "../models/company.model.js";
+
 import { Employee } from "../models/employee.model.js"; // Employee model import
 import jwt from "jsonwebtoken"; // JWT for token generation
 import { hashPassword, comparePassword } from "../utils/password.js"; // Password utilities for hashing and comparing
@@ -45,7 +46,6 @@ const adminRegister = async (req, res) => {
     // Save the company to the database
     await company.save();
 
-    // Create the email content using a template and send an email confirmation
     const text = adminTemplate(companyName, companyLocation, userName);
     Mailer(
       Email,
@@ -53,7 +53,7 @@ const adminRegister = async (req, res) => {
       text
     );
 
-    // Return success response after successful registration
+
     return res.status(200).json({
       status: "Success",
       message: "Company profile created",
@@ -69,15 +69,18 @@ const adminRegister = async (req, res) => {
   }
 };
 
+
 // Admin login function
 const adminLogin = async (req, res) => {
   const { userName, Email, Password } = req.body;
 
   // Check if all login details are provided
+
   if (!userName || !Email || !Password)
     return res
       .status(400)
       .json({ status: "Error", message: "Provide All details" });
+
 
   // Find the company by email
   const isUser = await Company.findOne({ Email });
@@ -92,18 +95,20 @@ const adminLogin = async (req, res) => {
   const validPassword = await comparePassword(isUser.Password, Password);
 
   // If the password is invalid, return an error response
+
   if (!validPassword)
     return res
       .status(400)
       .json({ status: "Bad Request", message: "Invalid Password" });
 
-  // Generate a JWT token and store it as a refresh token
+
   jwt.sign({ id: isUser._id }, process.env.SECRET_KEY, async (err, token) => {
     if (err)
       return res.status(500).json({
         status: "Internal Server Error",
         message: "Something went wrong",
       });
+
 
     // Set the refresh token for the user
     isUser.refreshToken = token;
@@ -114,6 +119,7 @@ const adminLogin = async (req, res) => {
     );
 
     // Return success response, set the token in cookies
+
     return res
       .status(200)
       .cookie("accessToken", token, { httpOnly: true, secure: true })
@@ -125,6 +131,7 @@ const adminLogin = async (req, res) => {
       });
   });
 };
+
 
 // Add an employee function
 const addEmployee = async (req, res) => {
@@ -204,6 +211,7 @@ const addEmployee = async (req, res) => {
 };
 
 // Change admin password function
+
 const changePassword = async (req, res) => {
   try {
     const user = req.user;
@@ -226,11 +234,11 @@ const changePassword = async (req, res) => {
     );
 
     // Return success response after updating password
+
     return res
       .status(200)
       .json({ status: "Success", message: "Password changed successfully" });
   } catch (error) {
-    // Return internal server error response in case of an issue
     return res.status(500).json({
       status: "Internal server error",
       message: "Something went wrong",
@@ -238,12 +246,14 @@ const changePassword = async (req, res) => {
   }
 };
 
+
 // Admin logout function
 const adminLogout = async (req, res) => {
   try {
     const user = req.user;
 
     // Remove the refresh token from the user's document
+
     await Company.findByIdAndUpdate(
       user._id,
       {
@@ -262,13 +272,10 @@ const adminLogout = async (req, res) => {
       .clearCookie("accessToken", { httpOnly: true, secure: true })
       .json({ status: "Success", message: "User logged out Successfully" });
   } catch (error) {
-    // Return internal server error response in case of an issue
     return res.status(500).json({
       status: "Internal server error",
       message: "Something went wrong",
     });
   }
 };
-
-// Export all the functions
 export { adminRegister, adminLogin, addEmployee, adminLogout, changePassword };

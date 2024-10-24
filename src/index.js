@@ -1,7 +1,7 @@
 import express from "express";
 import connectToDB from "./db/db.js";
 import { config } from "dotenv";
-import  Adminrouter from "./routes/adminRoutes.js";
+import  router from "./routes/adminRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 config();
@@ -17,7 +17,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-app.use("/admin", Adminrouter);
+app.use("/admin", router);
 
 app.get("/", (req, res) => {
   res.send("Server working successfully");

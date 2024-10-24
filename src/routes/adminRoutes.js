@@ -18,5 +18,4 @@ router.route("/addEmployee").post(validateUser, addEmployee);
 router.route("/getAll").get();
 router.route("/report").get();
 
-
 export default router;
