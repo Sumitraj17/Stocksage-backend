@@ -1,15 +1,23 @@
 {
-  "name": "stocksage",
+  "name": "stocksage-backend",
   "version": "1.0.0",
   "description": "Backend application for StockSage project",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon ./src/index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
   },
-  "author": "stocksage",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sumitraj17/Stocksage-backend.git"
+  },
+  "author": "",
   "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Sumitraj17/Stocksage-backend/issues"
+  },
+  "homepage": "https://github.com/Sumitraj17/Stocksage-backend#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
@@ -24,5 +32,8 @@
     "path": "^0.12.7",
     "url": "^0.11.4",
     "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
   }
 }

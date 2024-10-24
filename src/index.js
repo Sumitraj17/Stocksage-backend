@@ -1,7 +1,7 @@
 import express from "express";
 import connectToDB from "./db/db.js";
 import { config } from "dotenv";
-import router from "./routes/adminRoutes.js";
+import  router from "./routes/adminRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 config();
