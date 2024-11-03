@@ -1,78 +1,61 @@
 import { Company } from "../models/company.model.js";
-
-import { Employee } from "../models/employee.model.js"; // Employee model import
-import jwt from "jsonwebtoken"; // JWT for token generation
-import { hashPassword, comparePassword } from "../utils/password.js"; // Password utilities for hashing and comparing
-import Mailer from "../utils/mailer.js"; // Utility for sending emails
-import { adminTemplate } from "../constants/email.template.js"; // Email template for admin registration confirmation
-import { employeeTemplate } from "../constants/employee.template.js";
-import { v4 as uniqueId } from "uuid";
-
-// Admin registration function
-const adminRegister = async (req, res) => {
-  // Fetch data from the request body
-  const { companyName, companyLocation, userName, Email, Password } = req.body;
-
-  // Check if all required fields are provided
-  if (!companyLocation || !companyName || !userName || !Email || !Password)
-    return res
-      .status(400)
-      .json({ status: "Error", message: "Provide all data" });
-
+import { Employee } from "../models/employee.model.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { comparePassword, hashPassword } from "../utils/password.js";
+// Register a new admin
+export const adminRegister = async (req, res) => {
   try {
-    // Check if the company or email already exists in the database
-    const isUser = await Company.findOne({
-      $or: [{ Email }, { companyName }],
-    });
+    const { companyName, companyLocation, userName, Email, Password } =
+      req.body;
+    const hashedPassword = await bcrypt.hash(Password, 10);
 
-    // If company or email exists, return an error response
-    if (isUser)
-      return res.status(400).json({
-        status: "Bad Request",
-        message: "Company or Email Already Exists",
-      });
-
-    // Hash the password before storing it in the database
-    const hashedPassword = await hashPassword(Password);
-
-    // Create new company object with hashed password
-    const company = await new Company({
-      companyName: companyName,
-      companyLocation: companyLocation,
-      userName: userName,
-      Email: Email,
-      Password: hashedPassword, // Store hashed password
-    });
-
-    // Save the company to the database
-    await company.save();
-
-    const text = adminTemplate(companyName, companyLocation, userName);
-    Mailer(
+    const newCompany = new Company({
+      companyName,
+      companyLocation,
+      userName,
       Email,
-      "Your Company has been Successfully Registered on StockSage!",
-      text
-    );
+      Password: hashedPassword,
+    });
 
-
-    return res.status(200).json({
-      status: "Success",
-      message: "Company profile created",
+    await newCompany.save();
+    res.status(201).send({
+      success: true,
+      message: "Admin registered successfully",
+      company: newCompany,
     });
   } catch (error) {
-    console.error(error); // Log the error for debugging
-
-    // Return internal server error response in case of an issue
-    return res.status(500).json({
-      status: "Internal Error",
-      message: "Something went wrong",
-    });
+    console.error(error);
+    res
+      .status(500)
+      .send({ success: false, error, message: "Error registering admin" });
   }
 };
 
+// Admin login
+// export const adminLogin = async (req, res) => {
+//   try {
+//     const { Email, Password } = req.body;
+//     const admin = await Company.findOne({ Email });
+//     if (!admin || !(await bcrypt.compare(Password, admin.Password))) {
+//       return res.status(401).send({ error: "Invalid credentials" });
+//     }
 
-// Admin login function
-const adminLogin = async (req, res) => {
+//     // Generate a token (for simplicity)
+//     const token = "generated-token"; // Replace with actual token generation logic
+//     admin.refreshToken = token;
+//     await admin.save();
+
+//     res.status(200).send({ success: true, message: "Login successful", token });
+//   } catch (error) {
+//     console.error(error);
+//     res
+//       .status(500)
+//       .send({ success: false, error, message: "Error logging in" });
+//   }
+// };
+
+export const adminLogin = async (req, res) => {
   const { userName, Email, Password } = req.body;
 
   // Check if all login details are provided
@@ -81,7 +64,6 @@ const adminLogin = async (req, res) => {
     return res
       .status(400)
       .json({ status: "Error", message: "Provide All details" });
-
 
   // Find the company by email
   const isUser = await Company.findOne({ Email });
@@ -102,14 +84,12 @@ const adminLogin = async (req, res) => {
       .status(400)
       .json({ status: "Bad Request", message: "Invalid Password" });
 
-
   jwt.sign({ id: isUser._id }, process.env.SECRET_KEY, async (err, token) => {
     if (err)
       return res.status(500).json({
         status: "Internal Server Error",
         message: "Something went wrong",
       });
-
 
     // Set the refresh token for the user
     isUser.refreshToken = token;
@@ -133,153 +113,143 @@ const adminLogin = async (req, res) => {
   });
 };
 
-
-// Add an employee function
-const addEmployee = async (req, res) => {
-  const admin = req.user;
-  console.log(admin)
-  const { EmployeeName, EmployeeEmail} = req.body;
-
-  // Check if all employee data is provided
-  if (!EmployeeName || !EmployeeEmail) {
-    return res.status(400).json({
-      status: "Error",
-      message: "Provide all data including company ID",
-    });
-  }
-
+// Admin logout
+export const adminLogout = async (req, res) => {
   try {
-    // Check if the employee with the same email already exists
-    const isUser = await Employee.findOne({ EmployeeEmail });
-
-    // If employee exists, return an error response
-    if (isUser) {
-      return res.status(400).json({
-        status: "Bad Request",
-        message: "Employee with this email already exists",
-      });
+    const admin = await Company.findOneAndUpdate(
+      { refreshToken: req.token },
+      { refreshToken: null }
+    );
+    if (!admin) {
+      return res.status(404).send({ error: "Admin not found" });
     }
 
-    // Generate Password
-    const Password = uniqueId();
+    res.status(200).send({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send({ success: false, error, message: "Error logging out" });
+  }
+};
 
-    // Create and save the new employee object in the database
-    const employee = await Employee.create({
+// Change admin password
+export const changePassword = async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const admin = await Company.findOneAndUpdate(
+      { refreshToken: req.token },
+      { Password: hashedPassword }
+    );
+
+    if (!admin) {
+      return res.status(404).send({ error: "Admin not found" });
+    }
+
+    res
+      .status(200)
+      .send({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error(error);
+    res
+      .status(500)
+      .send({ success: false, error, message: "Error changing password" });
+  }
+};
+
+export const addEmployee = async (req, res) => {
+  try {
+    const { EmployeeName, EmployeeEmail, Password, companyName } = req.body;
+    const hashedPassword = await bcrypt.hash(Password, 10);
+
+    const employee = new Employee({
       EmployeeName,
       EmployeeEmail,
-      Password,
-      companyName:admin.companyName
+      Password: hashedPassword,
+      companyName,
     });
 
-    // If employee creation fails, return an error response
-    if (!employee) {
-      return res.status(500).json({
-        status: "Error",
-        message: "Failed to create employee",
-      });
-    }
-
-    // Add employee to the company's Employees array
-    const updatedCompany = await Company.findByIdAndUpdate(
-      admin._id,
-      { $push: { Employees: employee._id } },  // Add employee to company
-      { new: true }  // Return the updated company document
+    await employee.save();
+    await Company.findOneAndUpdate(
+      { companyName },
+      { $push: { Employees: employee._id } }
     );
-    console.log("Updated Company",updatedCompany)
-    // If adding to the company fails, return an error
-    if (!updatedCompany) {
-      return res.status(500).json({
-        status: "Error",
-        message: "Failed to add employee to the company",
-      });
-    }
 
-    // Send email notification to the new employee
-    const text = employeeTemplate(EmployeeName, EmployeeEmail, Password);
-    Mailer(EmployeeEmail, "Welcome to StockSage!", text);
-
-    // Return success response
-    return res.status(200).json({
-      status: "Success",
-      message: "Employee created, added to company, and email sent",
+    res.status(201).send({
+      success: true,
+      message: "Employee added successfully",
       employee,
-      updatedCompany
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({
-      status: "Error",
-      message: "Something went wrong",
-    });
+    res
+      .status(500)
+      .send({ success: false, error, message: "Error adding employee" });
   }
 };
-
-// Change admin password function
-
-const changePassword = async (req, res) => {
+export const updateEmployee = async (req, res) => {
   try {
-    const user = req.user;
-    const { Password } = req.body;
+    const { EmployeeEmail } = req.params;
+    const { EmployeeName, Password, companyName } = req.body;
 
-    // Hash the new password
-    const hashedPassword = await hashPassword(Password);
+    switch (true) {
+      case !EmployeeEmail:
+        return res.status(500).send({ error: "EmployeeEmail is required" });
+      case !EmployeeName:
+        return res.status(500).send({ error: "EmployeeName is required" });
+      case !Password:
+        return res.status(500).send({ error: "Password is required" });
+      case !companyName:
+        return res.status(500).send({ error: "Company Name is required" });
+    }
 
-    // Update the user's password in the database
-    await Company.findByIdAndUpdate(
-      user._id,
-      {
-        $set: {
-          Password: hashedPassword,
-        },
-      },
-      {
-        new: true, // Return the updated document
-      }
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { EmployeeEmail },
+      { EmployeeName, Password, companyName },
+      { new: true }
     );
 
-    // Return success response after updating password
+    if (!updatedEmployee) {
+      return res.status(404).send({ error: "Employee not found" });
+    }
 
-    return res
-      .status(200)
-      .json({ status: "Success", message: "Password changed successfully" });
+    res.status(200).send({
+      success: true,
+      message: "Employee updated successfully",
+      employee: updatedEmployee,
+    });
   } catch (error) {
-    return res.status(500).json({
-      status: "Internal server error",
-      message: "Something went wrong",
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error in updating employee",
     });
   }
 };
 
-
-// Admin logout function
-const adminLogout = async (req, res) => {
+export const deleteEmployee = async (req, res) => {
   try {
-    const user = req.user;
+    const { EmployeeEmail } = req.params;
 
-    // Remove the refresh token from the user's document
+    const deletedEmployee = await Employee.findOneAndDelete({ EmployeeEmail });
 
-    await Company.findByIdAndUpdate(
-      user._id,
-      {
-        $set: {
-          refreshToken: undefined,
-        },
-      },
-      {
-        new: true, // Return the updated document
-      }
-    );
+    if (!deletedEmployee) {
+      return res.status(404).send({ error: "Employee not found" });
+    }
 
-    // Clear the access token from cookies and return success response
-    return res
-      .status(200)
-      .clearCookie("accessToken", { httpOnly: true, secure: true })
-      .json({ status: "Success", message: "User logged out Successfully" });
+    res.status(200).send({
+      success: true,
+      message: "Employee deleted successfully",
+      employee: deletedEmployee,
+    });
   } catch (error) {
-    return res.status(500).json({
-      status: "Internal server error",
-      message: "Something went wrong",
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error in deleting employee",
     });
   }
 };
-export { adminRegister, adminLogin, addEmployee, adminLogout, changePassword };
