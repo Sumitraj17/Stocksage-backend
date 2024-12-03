@@ -282,4 +282,70 @@ const adminLogout = async (req, res) => {
     });
   }
 };
-export { adminRegister, adminLogin, addEmployee, adminLogout, changePassword };
+
+const updateEmployee = async (req, res) => {
+  try {
+    const { EmployeeEmail } = req.params;
+    const { EmployeeName, Password, companyName } = req.body;
+
+    switch (true) {
+      case !EmployeeEmail:
+        return res.status(500).send({ error: "EmployeeEmail is required" });
+      case !EmployeeName:
+        return res.status(500).send({ error: "EmployeeName is required" });
+      case !Password:
+        return res.status(500).send({ error: "Password is required" });
+      case !companyName:
+        return res.status(500).send({ error: "Company Name is required" });
+    }
+
+    const updatedEmployee = await Employee.findOneAndUpdate(
+      { EmployeeEmail },
+      { EmployeeName, Password, companyName },
+      { new: true }
+    );
+
+    if (!updatedEmployee) {
+      return res.status(404).send({ error: "Employee not found" });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Employee updated successfully",
+      employee: updatedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error in updating employee",
+    });
+  }
+};
+
+const deleteEmployee = async (req, res) => {
+  try {
+    const { EmployeeEmail } = req.params;
+
+    const deletedEmployee = await Employee.findOneAndDelete({ EmployeeEmail });
+
+    if (!deletedEmployee) {
+      return res.status(404).send({ error: "Employee not found" });
+    }
+
+    res.status(200).send({
+      success: true,
+      message: "Employee deleted successfully",
+      employee: deletedEmployee,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({
+      success: false,
+      error,
+      message: "Error in deleting employee",
+    });
+  }
+};
+export { adminRegister, adminLogin, addEmployee, adminLogout, changePassword,updateEmployee,deleteEmployee };

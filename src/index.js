@@ -2,6 +2,8 @@ import express from "express";
 import connectToDB from "./db/db.js";
 import { config } from "dotenv";
 import  router from "./routes/adminRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
+import salesRoutes from "./routes/salesRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 config();
@@ -19,6 +21,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/admin", router);
+app.use("/api/v1/product", productRoutes);
+app.use("/api/v1/sales", salesRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server working successfully");

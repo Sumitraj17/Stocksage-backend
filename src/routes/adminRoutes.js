@@ -5,6 +5,8 @@ import {
   addEmployee,
   adminLogout,
   changePassword,
+  updateEmployee,
+  deleteEmployee,
 } from "../controller/adminController.js";
 import { validateUser } from "../middleware/validator.middleware.js";
 
@@ -17,5 +19,7 @@ router.route("/changePassword").post(validateUser,changePassword)
 router.route("/addEmployee").post(validateUser, addEmployee);
 router.route("/getAll").get();
 router.route("/report").get();
+router.route("/updateEmployee/:EmployeeEmail").put(updateEmployee);
+router.route("/deleteEmployee/:EmployeeEmail").delete(deleteEmployee);
 
 export default router;
