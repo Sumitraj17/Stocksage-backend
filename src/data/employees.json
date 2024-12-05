@@ -1,0 +1,352 @@
+[
+    {
+        "_id": "emp1",
+        "EmployeeName": "Employee 1",
+        "EmployeeEmail": "employee1@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp2",
+        "EmployeeName": "Employee 2",
+        "EmployeeEmail": "employee2@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp3",
+        "EmployeeName": "Employee 3",
+        "EmployeeEmail": "employee3@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp4",
+        "EmployeeName": "Employee 4",
+        "EmployeeEmail": "employee4@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp5",
+        "EmployeeName": "Employee 5",
+        "EmployeeEmail": "employee5@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp6",
+        "EmployeeName": "Employee 6",
+        "EmployeeEmail": "employee6@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp7",
+        "EmployeeName": "Employee 7",
+        "EmployeeEmail": "employee7@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp8",
+        "EmployeeName": "Employee 8",
+        "EmployeeEmail": "employee8@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp9",
+        "EmployeeName": "Employee 9",
+        "EmployeeEmail": "employee9@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp10",
+        "EmployeeName": "Employee 10",
+        "EmployeeEmail": "employee10@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp11",
+        "EmployeeName": "Employee 11",
+        "EmployeeEmail": "employee11@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp12",
+        "EmployeeName": "Employee 12",
+        "EmployeeEmail": "employee12@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp13",
+        "EmployeeName": "Employee 13",
+        "EmployeeEmail": "employee13@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp14",
+        "EmployeeName": "Employee 14",
+        "EmployeeEmail": "employee14@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp15",
+        "EmployeeName": "Employee 15",
+        "EmployeeEmail": "employee15@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp16",
+        "EmployeeName": "Employee 16",
+        "EmployeeEmail": "employee16@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp17",
+        "EmployeeName": "Employee 17",
+        "EmployeeEmail": "employee17@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp18",
+        "EmployeeName": "Employee 18",
+        "EmployeeEmail": "employee18@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp19",
+        "EmployeeName": "Employee 19",
+        "EmployeeEmail": "employee19@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp20",
+        "EmployeeName": "Employee 20",
+        "EmployeeEmail": "employee20@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp21",
+        "EmployeeName": "Employee 21",
+        "EmployeeEmail": "employee21@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp22",
+        "EmployeeName": "Employee 22",
+        "EmployeeEmail": "employee22@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp23",
+        "EmployeeName": "Employee 23",
+        "EmployeeEmail": "employee23@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp24",
+        "EmployeeName": "Employee 24",
+        "EmployeeEmail": "employee24@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp25",
+        "EmployeeName": "Employee 25",
+        "EmployeeEmail": "employee25@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp26",
+        "EmployeeName": "Employee 26",
+        "EmployeeEmail": "employee26@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp27",
+        "EmployeeName": "Employee 27",
+        "EmployeeEmail": "employee27@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp28",
+        "EmployeeName": "Employee 28",
+        "EmployeeEmail": "employee28@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp29",
+        "EmployeeName": "Employee 29",
+        "EmployeeEmail": "employee29@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp30",
+        "EmployeeName": "Employee 30",
+        "EmployeeEmail": "employee30@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp31",
+        "EmployeeName": "Employee 31",
+        "EmployeeEmail": "employee31@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp32",
+        "EmployeeName": "Employee 32",
+        "EmployeeEmail": "employee32@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp33",
+        "EmployeeName": "Employee 33",
+        "EmployeeEmail": "employee33@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp34",
+        "EmployeeName": "Employee 34",
+        "EmployeeEmail": "employee34@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp35",
+        "EmployeeName": "Employee 35",
+        "EmployeeEmail": "employee35@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp36",
+        "EmployeeName": "Employee 36",
+        "EmployeeEmail": "employee36@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp37",
+        "EmployeeName": "Employee 37",
+        "EmployeeEmail": "employee37@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp38",
+        "EmployeeName": "Employee 38",
+        "EmployeeEmail": "employee38@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp39",
+        "EmployeeName": "Employee 39",
+        "EmployeeEmail": "employee39@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp40",
+        "EmployeeName": "Employee 40",
+        "EmployeeEmail": "employee40@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp41",
+        "EmployeeName": "Employee 41",
+        "EmployeeEmail": "employee41@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp42",
+        "EmployeeName": "Employee 42",
+        "EmployeeEmail": "employee42@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp43",
+        "EmployeeName": "Employee 43",
+        "EmployeeEmail": "employee43@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp44",
+        "EmployeeName": "Employee 44",
+        "EmployeeEmail": "employee44@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp45",
+        "EmployeeName": "Employee 45",
+        "EmployeeEmail": "employee45@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp46",
+        "EmployeeName": "Employee 46",
+        "EmployeeEmail": "employee46@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp47",
+        "EmployeeName": "Employee 47",
+        "EmployeeEmail": "employee47@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp48",
+        "EmployeeName": "Employee 48",
+        "EmployeeEmail": "employee48@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp49",
+        "EmployeeName": "Employee 49",
+        "EmployeeEmail": "employee49@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    },
+    {
+        "_id": "emp50",
+        "EmployeeName": "Employee 50",
+        "EmployeeEmail": "employee50@example.com",
+        "Password": "hashedPassword123",
+        "companyName": "StockSage"
+    }
+]

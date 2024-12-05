@@ -1,0 +1,602 @@
+[
+    {
+        "productId": "5ZOFCH",
+        "productName": "Apparatus41",
+        "totalStock": 120,
+        "pricePerUnit": 423.55
+    },
+    {
+        "productId": "DR6F9A",
+        "productName": "Supply90",
+        "totalStock": 250,
+        "pricePerUnit": 468.51
+    },
+    {
+        "productId": "OEF4AA",
+        "productName": "Equipment68",
+        "totalStock": 281,
+        "pricePerUnit": 370.12
+    },
+    {
+        "productId": "K2D45C",
+        "productName": "Gear95",
+        "totalStock": 70,
+        "pricePerUnit": 393.36
+    },
+    {
+        "productId": "2WHZ3S",
+        "productName": "Fixture45",
+        "totalStock": 413,
+        "pricePerUnit": 230.97
+    },
+    {
+        "productId": "V3CEUS",
+        "productName": "Accessory40",
+        "totalStock": 215,
+        "pricePerUnit": 368.15
+    },
+    {
+        "productId": "UIQYZ3",
+        "productName": "Accessory53",
+        "totalStock": 494,
+        "pricePerUnit": 486.22
+    },
+    {
+        "productId": "V8DTBG",
+        "productName": "Unit57",
+        "totalStock": 109,
+        "pricePerUnit": 36.69
+    },
+    {
+        "productId": "V02KKN",
+        "productName": "Tool53",
+        "totalStock": 415,
+        "pricePerUnit": 294.85
+    },
+    {
+        "productId": "D4769A",
+        "productName": "Product98",
+        "totalStock": 129,
+        "pricePerUnit": 173.0
+    },
+    {
+        "productId": "N219HZ",
+        "productName": "Module39",
+        "totalStock": 406,
+        "pricePerUnit": 435.53
+    },
+    {
+        "productId": "FEIVUW",
+        "productName": "Equipment33",
+        "totalStock": 293,
+        "pricePerUnit": 412.16
+    },
+    {
+        "productId": "FJYQD9",
+        "productName": "Instrument24",
+        "totalStock": 57,
+        "pricePerUnit": 26.36
+    },
+    {
+        "productId": "LF4JK8",
+        "productName": "Widget77",
+        "totalStock": 253,
+        "pricePerUnit": 54.87
+    },
+    {
+        "productId": "QOSBTF",
+        "productName": "Component72",
+        "totalStock": 336,
+        "pricePerUnit": 414.02
+    },
+    {
+        "productId": "T7UOU1",
+        "productName": "Instrument98",
+        "totalStock": 498,
+        "pricePerUnit": 35.08
+    },
+    {
+        "productId": "MB0JKO",
+        "productName": "Supply65",
+        "totalStock": 211,
+        "pricePerUnit": 188.83
+    },
+    {
+        "productId": "Q5P5TL",
+        "productName": "Module11",
+        "totalStock": 285,
+        "pricePerUnit": 117.88
+    },
+    {
+        "productId": "80OPYY",
+        "productName": "Accessory39",
+        "totalStock": 411,
+        "pricePerUnit": 102.96
+    },
+    {
+        "productId": "AF9WQQ",
+        "productName": "Equipment38",
+        "totalStock": 371,
+        "pricePerUnit": 201.3
+    },
+    {
+        "productId": "XPA29S",
+        "productName": "Part52",
+        "totalStock": 146,
+        "pricePerUnit": 23.53
+    },
+    {
+        "productId": "8JIZ6Q",
+        "productName": "Material55",
+        "totalStock": 140,
+        "pricePerUnit": 342.69
+    },
+    {
+        "productId": "ARZ25O",
+        "productName": "Component99",
+        "totalStock": 77,
+        "pricePerUnit": 52.6
+    },
+    {
+        "productId": "DD5WUV",
+        "productName": "Material14",
+        "totalStock": 43,
+        "pricePerUnit": 320.05
+    },
+    {
+        "productId": "MKQ1ST",
+        "productName": "Accessory44",
+        "totalStock": 354,
+        "pricePerUnit": 40.36
+    },
+    {
+        "productId": "XGNQ5F",
+        "productName": "Item2",
+        "totalStock": 492,
+        "pricePerUnit": 164.36
+    },
+    {
+        "productId": "GMBQ0B",
+        "productName": "Unit87",
+        "totalStock": 355,
+        "pricePerUnit": 18.89
+    },
+    {
+        "productId": "CF2DPT",
+        "productName": "Material22",
+        "totalStock": 124,
+        "pricePerUnit": 237.75
+    },
+    {
+        "productId": "2IINOR",
+        "productName": "Appliance85",
+        "totalStock": 156,
+        "pricePerUnit": 44.41
+    },
+    {
+        "productId": "4NU867",
+        "productName": "Fixture72",
+        "totalStock": 20,
+        "pricePerUnit": 107.15
+    },
+    {
+        "productId": "LGAJPU",
+        "productName": "Component37",
+        "totalStock": 110,
+        "pricePerUnit": 214.28
+    },
+    {
+        "productId": "EHJ9EV",
+        "productName": "Kit41",
+        "totalStock": 347,
+        "pricePerUnit": 180.5
+    },
+    {
+        "productId": "IVPW67",
+        "productName": "Unit16",
+        "totalStock": 437,
+        "pricePerUnit": 82.04
+    },
+    {
+        "productId": "5IEJNK",
+        "productName": "Module52",
+        "totalStock": 223,
+        "pricePerUnit": 416.8
+    },
+    {
+        "productId": "Y3JBGZ",
+        "productName": "Widget59",
+        "totalStock": 192,
+        "pricePerUnit": 23.69
+    },
+    {
+        "productId": "T9WCSC",
+        "productName": "Widget45",
+        "totalStock": 140,
+        "pricePerUnit": 484.31
+    },
+    {
+        "productId": "TNWPN9",
+        "productName": "Kit75",
+        "totalStock": 326,
+        "pricePerUnit": 40.53
+    },
+    {
+        "productId": "338DQU",
+        "productName": "Instrument53",
+        "totalStock": 285,
+        "pricePerUnit": 103.48
+    },
+    {
+        "productId": "6KC0RD",
+        "productName": "Product35",
+        "totalStock": 403,
+        "pricePerUnit": 43.8
+    },
+    {
+        "productId": "BIB8MZ",
+        "productName": "Product29",
+        "totalStock": 450,
+        "pricePerUnit": 147.41
+    },
+    {
+        "productId": "C1J6C0",
+        "productName": "Fixture49",
+        "totalStock": 265,
+        "pricePerUnit": 304.13
+    },
+    {
+        "productId": "LYSGOK",
+        "productName": "Instrument1",
+        "totalStock": 232,
+        "pricePerUnit": 256.5
+    },
+    {
+        "productId": "ISK1MD",
+        "productName": "Tool53",
+        "totalStock": 176,
+        "pricePerUnit": 124.2
+    },
+    {
+        "productId": "XV0QES",
+        "productName": "Apparatus3",
+        "totalStock": 440,
+        "pricePerUnit": 102.73
+    },
+    {
+        "productId": "RZZG2X",
+        "productName": "Material66",
+        "totalStock": 138,
+        "pricePerUnit": 48.38
+    },
+    {
+        "productId": "7GACM1",
+        "productName": "Equipment37",
+        "totalStock": 352,
+        "pricePerUnit": 227.19
+    },
+    {
+        "productId": "9JOTVN",
+        "productName": "Product33",
+        "totalStock": 111,
+        "pricePerUnit": 234.85
+    },
+    {
+        "productId": "VHPZ6D",
+        "productName": "Equipment26",
+        "totalStock": 278,
+        "pricePerUnit": 495.2
+    },
+    {
+        "productId": "0ZLP9S",
+        "productName": "Product34",
+        "totalStock": 197,
+        "pricePerUnit": 378.54
+    },
+    {
+        "productId": "ACJTXQ",
+        "productName": "Component2",
+        "totalStock": 169,
+        "pricePerUnit": 434.22
+    },
+    {
+        "productId": "5Q1M0D",
+        "productName": "Tool87",
+        "totalStock": 137,
+        "pricePerUnit": 69.66
+    },
+    {
+        "productId": "A98Y0Q",
+        "productName": "Equipment16",
+        "totalStock": 358,
+        "pricePerUnit": 90.8
+    },
+    {
+        "productId": "4WH1ZH",
+        "productName": "Device53",
+        "totalStock": 380,
+        "pricePerUnit": 152.27
+    },
+    {
+        "productId": "9TAYQG",
+        "productName": "Tool26",
+        "totalStock": 390,
+        "pricePerUnit": 243.64
+    },
+    {
+        "productId": "06WWIP",
+        "productName": "Unit64",
+        "totalStock": 50,
+        "pricePerUnit": 170.13
+    },
+    {
+        "productId": "4W41GH",
+        "productName": "Device11",
+        "totalStock": 161,
+        "pricePerUnit": 14.95
+    },
+    {
+        "productId": "NGIM4U",
+        "productName": "Kit72",
+        "totalStock": 249,
+        "pricePerUnit": 462.61
+    },
+    {
+        "productId": "JJZP24",
+        "productName": "Part98",
+        "totalStock": 59,
+        "pricePerUnit": 213.7
+    },
+    {
+        "productId": "ZADZQD",
+        "productName": "Appliance38",
+        "totalStock": 461,
+        "pricePerUnit": 222.04
+    },
+    {
+        "productId": "T46XWK",
+        "productName": "Equipment35",
+        "totalStock": 114,
+        "pricePerUnit": 462.81
+    },
+    {
+        "productId": "BIQTKE",
+        "productName": "Module77",
+        "totalStock": 197,
+        "pricePerUnit": 425.89
+    },
+    {
+        "productId": "JQTMQZ",
+        "productName": "Device96",
+        "totalStock": 494,
+        "pricePerUnit": 108.87
+    },
+    {
+        "productId": "4ELLEZ",
+        "productName": "Module63",
+        "totalStock": 374,
+        "pricePerUnit": 276.55
+    },
+    {
+        "productId": "UPH1XS",
+        "productName": "Component6",
+        "totalStock": 210,
+        "pricePerUnit": 116.7
+    },
+    {
+        "productId": "5GLIHE",
+        "productName": "Appliance55",
+        "totalStock": 409,
+        "pricePerUnit": 217.93
+    },
+    {
+        "productId": "OH1I7I",
+        "productName": "Equipment90",
+        "totalStock": 375,
+        "pricePerUnit": 387.86
+    },
+    {
+        "productId": "AXDZXL",
+        "productName": "Gadget66",
+        "totalStock": 261,
+        "pricePerUnit": 223.67
+    },
+    {
+        "productId": "N3LUZL",
+        "productName": "Supply22",
+        "totalStock": 259,
+        "pricePerUnit": 445.54
+    },
+    {
+        "productId": "6BPY42",
+        "productName": "Appliance88",
+        "totalStock": 398,
+        "pricePerUnit": 19.86
+    },
+    {
+        "productId": "VDG3YS",
+        "productName": "Supply93",
+        "totalStock": 487,
+        "pricePerUnit": 179.13
+    },
+    {
+        "productId": "F8MI3W",
+        "productName": "Device18",
+        "totalStock": 246,
+        "pricePerUnit": 120.0
+    },
+    {
+        "productId": "Z27IOA",
+        "productName": "Supply78",
+        "totalStock": 156,
+        "pricePerUnit": 57.23
+    },
+    {
+        "productId": "0OJ0PK",
+        "productName": "Part54",
+        "totalStock": 271,
+        "pricePerUnit": 98.97
+    },
+    {
+        "productId": "6XKTI5",
+        "productName": "Gear4",
+        "totalStock": 258,
+        "pricePerUnit": 423.71
+    },
+    {
+        "productId": "JTDK3B",
+        "productName": "Product61",
+        "totalStock": 182,
+        "pricePerUnit": 180.17
+    },
+    {
+        "productId": "ZHG424",
+        "productName": "Device37",
+        "totalStock": 491,
+        "pricePerUnit": 190.72
+    },
+    {
+        "productId": "PBVYDE",
+        "productName": "Equipment93",
+        "totalStock": 481,
+        "pricePerUnit": 472.59
+    },
+    {
+        "productId": "SHTIR0",
+        "productName": "Instrument46",
+        "totalStock": 283,
+        "pricePerUnit": 375.34
+    },
+    {
+        "productId": "P2PMNP",
+        "productName": "Component34",
+        "totalStock": 37,
+        "pricePerUnit": 126.06
+    },
+    {
+        "productId": "FN9GHS",
+        "productName": "Unit29",
+        "totalStock": 192,
+        "pricePerUnit": 404.52
+    },
+    {
+        "productId": "IQUV2Y",
+        "productName": "Module95",
+        "totalStock": 25,
+        "pricePerUnit": 34.73
+    },
+    {
+        "productId": "03389Y",
+        "productName": "Gear53",
+        "totalStock": 455,
+        "pricePerUnit": 347.38
+    },
+    {
+        "productId": "TW0MF1",
+        "productName": "Kit68",
+        "totalStock": 170,
+        "pricePerUnit": 207.26
+    },
+    {
+        "productId": "E8BTK2",
+        "productName": "Supply88",
+        "totalStock": 376,
+        "pricePerUnit": 401.67
+    },
+    {
+        "productId": "SYW8I1",
+        "productName": "Part90",
+        "totalStock": 156,
+        "pricePerUnit": 404.76
+    },
+    {
+        "productId": "2DJYL0",
+        "productName": "Component7",
+        "totalStock": 22,
+        "pricePerUnit": 328.15
+    },
+    {
+        "productId": "Z3CO9M",
+        "productName": "Fixture1",
+        "totalStock": 266,
+        "pricePerUnit": 215.11
+    },
+    {
+        "productId": "RV3XPP",
+        "productName": "Component83",
+        "totalStock": 361,
+        "pricePerUnit": 239.97
+    },
+    {
+        "productId": "XTYFNM",
+        "productName": "Tool28",
+        "totalStock": 354,
+        "pricePerUnit": 216.19
+    },
+    {
+        "productId": "Y6R6B0",
+        "productName": "Apparatus6",
+        "totalStock": 333,
+        "pricePerUnit": 327.45
+    },
+    {
+        "productId": "0NWBX8",
+        "productName": "Module52",
+        "totalStock": 79,
+        "pricePerUnit": 178.44
+    },
+    {
+        "productId": "0KQWX6",
+        "productName": "Equipment78",
+        "totalStock": 415,
+        "pricePerUnit": 416.24
+    },
+    {
+        "productId": "P77VZH",
+        "productName": "Instrument34",
+        "totalStock": 260,
+        "pricePerUnit": 70.77
+    },
+    {
+        "productId": "RXK3KK",
+        "productName": "Widget81",
+        "totalStock": 434,
+        "pricePerUnit": 45.35
+    },
+    {
+        "productId": "LWF2EU",
+        "productName": "Supply34",
+        "totalStock": 240,
+        "pricePerUnit": 125.52
+    },
+    {
+        "productId": "S1WEKY",
+        "productName": "Item37",
+        "totalStock": 84,
+        "pricePerUnit": 258.33
+    },
+    {
+        "productId": "PW2M34",
+        "productName": "Device2",
+        "totalStock": 72,
+        "pricePerUnit": 454.62
+    },
+    {
+        "productId": "M9D9ST",
+        "productName": "Device46",
+        "totalStock": 218,
+        "pricePerUnit": 140.57
+    },
+    {
+        "productId": "XT8BX0",
+        "productName": "Equipment14",
+        "totalStock": 247,
+        "pricePerUnit": 435.44
+    },
+    {
+        "productId": "4UR8RG",
+        "productName": "Device54",
+        "totalStock": 74,
+        "pricePerUnit": 147.11
+    }
+]

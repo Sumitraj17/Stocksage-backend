@@ -5,22 +5,21 @@ import {
   deleteProductController,
   getAllProductsController,
   getProductController,
+  // getProductsFromFile,
   updateProductController,
 } from "../controller/productController.js";
 const router = Router();
 
-router.route("/create-product").post(validateUser, createProductController);
+router.route("/createProduct").post(createProductController);
 
-router
-  .route("/update-product/:productId")
-  .put(validateUser, updateProductController);
+router.route("/updateProduct/:productId").put(updateProductController);
 
-router.route("/get-product/:productId").get(validateUser, getProductController);
+router.route("/getProduct/:productId").get(getProductController);
 
-router.route("/get-all-products").get(validateUser, getAllProductsController);
+router.route("/getAllProducts").get(getAllProductsController);
 
-router
-  .route("/delete-product/:productId")
-  .delete(validateUser, deleteProductController);
+router.route("/deleteProduct/:productId").delete(deleteProductController);
+
+// router.get("/getProducts", getProductsFromFile);
 
 export default router;

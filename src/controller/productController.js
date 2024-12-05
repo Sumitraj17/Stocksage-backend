@@ -143,3 +143,31 @@ export const deleteProductController = async (req, res) => {
     });
   }
 };
+
+// import fs from "fs";
+// import path from "path";
+// import { fileURLToPath } from "url";
+
+// // Create __dirname equivalent in ES modules
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+// export const getProductsFromFile = (req, res) => {
+//   try {
+//     // Use `path.join` to resolve the file path
+//     const filePath = path.join(__dirname, "data", "products.json");
+//     const products = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+
+//     // Debugging log to verify data structure
+//     console.log("Returning products data:", products);
+
+//     if (Array.isArray(products)) {
+//       res.status(200).json(products);
+//     } else {
+//       throw new Error("Invalid JSON format: Data must be an array");
+//     }
+//   } catch (error) {
+//     console.error("Error loading products:", error.message);
+//     res.status(500).json({ error: "Failed to load products" });
+//   }
+// }
