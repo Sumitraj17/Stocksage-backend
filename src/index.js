@@ -6,6 +6,7 @@ import productRoutes from "./routes/productRoutes.js";
 import salesRoutes from "./routes/salesRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import multer from 'multer'
 config();
 
 const app = express();
@@ -19,6 +20,8 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
+
 
 app.use("/admin", router);
 app.use("/api/v1/product", productRoutes);

@@ -7,6 +7,7 @@ import Mailer from "../utils/mailer.js"; // Utility for sending emails
 import { adminTemplate } from "../constants/email.template.js"; // Email template for admin registration confirmation
 import { employeeTemplate } from "../constants/employee.template.js";
 import { v4 as uniqueId } from "uuid";
+import mongoose from "mongoose";
 
 // Admin registration function
 const adminRegister = async (req, res) => {
@@ -47,6 +48,15 @@ const adminRegister = async (req, res) => {
     // Save the company to the database
     await company.save();
 
+    const employee = await new Employee({
+      companyName: companyName,
+      EmployeeName:userName,
+      EmployeeEmail:Email,
+      Password:hashedPassword,
+      Role:'Admin'
+    })
+
+    await employee.save();
     const text = adminTemplate(companyName, companyLocation, userName);
     Mailer(
       Email,
@@ -80,14 +90,14 @@ const adminLogin = async (req, res) => {
       .status(400)
       .json({ status: "Error", message: "Provide All details" });
 
-  // Find the company by email
-  const isUser = await Company.findOne({ Email });
+  // Find by email
+  const isUser = await Employee.findOne({EmployeeEmail: Email });
 
   // If company is not found, return an error response
   if (!isUser)
     return res
       .status(400)
-      .json({ status: "Bad Request", message: "Company does not exist" });
+      .json({ status: "Bad Request", message: "Employee does not exist" });
 
   // Compare the provided password with the stored hashed password
   const validPassword = await comparePassword(isUser.Password, Password);
@@ -110,19 +120,23 @@ const adminLogin = async (req, res) => {
     isUser.refreshToken = token;
 
     // Select user data excluding sensitive fields (password and refreshToken)
-    const user = await Company.findById(isUser._id).select(
-      " -Password -refreshToken"
+    const user = await Employee.findById(isUser._id).select(
+      " -Password"
     );
 
     // Return success response, set the token in cookies
-
+    console.log(user)
     return res
       .status(200)
-      .cookie("accessToken", token, { httpOnly: true, secure: true })
+      .cookie("accessToken", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      })
       .json({
         status: "Success",
         message: "User login successful",
-        admin: true,
+        admin:user.Role==='Admin'?true:false,
         user,
       });
   });
@@ -171,23 +185,11 @@ const adminLogout = async (req, res) => {
 
     // Remove the refresh token from the user's document
 
-    await Company.findByIdAndUpdate(
-      user._id,
-      {
-        $set: {
-          refreshToken: undefined,
-        },
-      },
-      {
-        new: true, // Return the updated document
-      }
-    );
-
     // Clear the access token from cookies and return success response
     return res
       .status(200)
       .clearCookie("accessToken", { httpOnly: true, secure: true })
-      .json({ status: "Success", message: "User logged out Successfully" });
+      .json({ status: "Success", message: "Logged out Successfully" });
   } catch (error) {
     return res.status(500).json({
       status: "Internal server error",
@@ -197,44 +199,52 @@ const adminLogout = async (req, res) => {
 };
 
 // Add an employee function
+
 const addEmployee = async (req, res) => {
   try {
-    const { EmployeeName, EmployeeEmail, Password, companyName } = req.body;
-
+    const { EmployeeName, EmployeeEmail, Role } = req.body;
+    const admin = req.user;
     // Validate input fields
-    if (!EmployeeName || !EmployeeEmail || !Password || !companyName) {
+    if (!EmployeeName || !EmployeeEmail) {
       return res.status(400).send({ error: "All fields are required" });
     }
 
-    // Check if employee already exists
+    // Check if the company exists
+    const company = await Company.findOne({ companyName:admin.companyName });
+
+    if (!company) {
+      return res
+        .status(404)
+        .json({ status: "Bad Request", message: "Company Doesn't Exist" });
+    }
+
+    // Check if the employee already exists in the Employee model
     const existingEmployee = await Employee.findOne({ EmployeeEmail });
     if (existingEmployee) {
       return res.status(400).send({ error: "Employee already exists" });
     }
-
-    // Create new employee
+    const Password = uniqueId()
+    const hashedPassword = await hashPassword(Password);
+    // Create and save the new employee
     const newEmployee = new Employee({
       EmployeeName,
       EmployeeEmail,
-      Password,
-      companyName,
+      companyName:admin.companyName,
+      Password:hashedPassword,
+      Role
     });
     await newEmployee.save();
 
-    // Update the company with the new employee
-    const company = await Company.findOne({ companyName });
-    if (company) {
-      // Ensure Employees array is initialized
-      if (!company.Employees) {
-        company.Employees = []; // Initialize as an empty array if not present
-      }
-
-      company.Employees.push(newEmployee._id); // Add new employee to the array
-      await company.save();
-    } else {
-      // If no company is found, handle the case (optional)
-      return res.status(400).send({ error: "Company not found" });
+    // Initialize Employees array if not present and update company
+    if (!company.Employees) {
+      company.Employees = [];
     }
+    company.Employees.push(newEmployee._id); // Add employee ID to company's Employees array
+    await company.save();
+
+    const text = employeeTemplate(EmployeeName, EmployeeEmail, Password,admin.companyName);
+    console.log(text)
+    Mailer(EmployeeEmail, "Welcome to StockSage!", text);
 
     res.status(201).send({
       success: true,
@@ -250,6 +260,9 @@ const addEmployee = async (req, res) => {
     });
   }
 };
+
+
+
 
 // Update employee
 const updateEmployee = async (req, res) => {
@@ -300,14 +313,17 @@ const updateEmployee = async (req, res) => {
 // Delete employee
 const deleteEmployee = async (req, res) => {
   const { EmployeeEmail } = req.params;
-
+  const admin = req.user;
   try {
     const deletedEmployee = await Employee.findOneAndDelete({ EmployeeEmail });
-
     if (!deletedEmployee) {
       return res.status(404).json({ message: "Employee not found" });
     }
-
+    
+    const emp = await Company.updateOne({_id:admin._id},{
+      $pull:{Employees: new mongoose.Types.ObjectId(deletedEmployee._id)}
+    })
+    console.log(emp)
     res.json({ message: "Employee deleted successfully" });
   } catch (err) {
     console.error("Error deleting employee:", err);

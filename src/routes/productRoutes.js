@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { validateUser } from "../middleware/validator.middleware.js";
+import { validateUser,validateEmployee } from "../middleware/validator.middleware.js";
 import {
   createProductController,
   deleteProductController,
@@ -7,19 +7,26 @@ import {
   getProductController,
   // getProductsFromFile,
   updateProductController,
+  uploadCSVController
 } from "../controller/productController.js";
+import multer from "multer";
+import Papa from "papaparse";
+
+
 const router = Router();
 
-router.route("/createProduct").post(createProductController);
+router.route("/createProduct").post(validateEmployee ,createProductController);
 
-router.route("/updateProduct/:productId").put(updateProductController);
+router.route("/updateProduct/:productId").put(validateEmployee ,updateProductController);
 
 router.route("/getProduct/:productId").get(getProductController);
 
-router.route("/getAllProducts").get(getAllProductsController);
+router.route("/getAllProducts").get(validateEmployee,getAllProductsController);
 
-router.route("/deleteProduct/:productId").delete(deleteProductController);
+router.route("/deleteProduct/:productId").delete(validateEmployee ,deleteProductController);
 
-// router.get("/getProducts", getProductsFromFile);
+const upload = multer({ dest: "uploads/" }); // Adjust destination as needed
+
+router.post("/uploadCSV", upload.single("file"),validateEmployee, uploadCSVController);
 
 export default router;

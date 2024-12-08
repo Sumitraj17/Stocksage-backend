@@ -1,8 +1,11 @@
 import { Products } from "../models/product.models.js";
+import fs from "fs";
+import Papa from "papaparse";
 
 export const createProductController = async (req, res) => {
   try {
     const { productId, productName, totalStock, pricePerUnit } = req.body;
+    const admin = req.user;
     switch (true) {
       case !productId:
         return res.status(500).send({ error: "Product ID is required" });
@@ -13,7 +16,13 @@ export const createProductController = async (req, res) => {
       case !pricePerUnit:
         return res.status(500).send({ error: "Price is required" });
     }
-    const products = new Products(req.body);
+    const products = new Products({
+      companyName: admin.companyName,
+      productId,
+      productName,
+      totalStock,
+      pricePerUnit,
+    });
     await products.save();
     res.status(201).send({
       success: true,
@@ -77,10 +86,6 @@ export const getProductController = async (req, res) => {
 
     const product = await Products.findOne({ productId });
 
-    if (!product) {
-      return res.status(404).send({ error: "Product not found" });
-    }
-
     res.status(200).send({
       success: true,
       message: "Product fetched successfully",
@@ -98,12 +103,8 @@ export const getProductController = async (req, res) => {
 
 export const getAllProductsController = async (req, res) => {
   try {
-    const products = await Products.find();
-
-    if (!products || products.length === 0) {
-      return res.status(404).send({ message: "No products found" });
-    }
-
+    const employee = req.user
+    const products = await Products.find({companyName:employee.companyName});
     res.status(200).send({
       success: true,
       message: "Products fetched successfully",
@@ -144,30 +145,82 @@ export const deleteProductController = async (req, res) => {
   }
 };
 
-// import fs from "fs";
-// import path from "path";
-// import { fileURLToPath } from "url";
+export const uploadCSVController = async (req, res) => {
+  try {
+    console.log("Entered")
+    const file = req.file; // The uploaded file
+    const admin = req.user; // Logged-in user, for companyName association
 
-// // Create __dirname equivalent in ES modules
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
+    if (!file) {
+      return res.status(400).send({
+        success: false,
+        message: "No file uploaded",
+      });
+    }
 
-// export const getProductsFromFile = (req, res) => {
-//   try {
-//     // Use `path.join` to resolve the file path
-//     const filePath = path.join(__dirname, "data", "products.json");
-//     const products = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    // Read the uploaded CSV file
+    const csvData = fs.readFileSync(file.path, "utf-8");
 
-//     // Debugging log to verify data structure
-//     console.log("Returning products data:", products);
+    // Parse the CSV data
+    const parsedData = Papa.parse(csvData, {
+      header: true,
+      skipEmptyLines: true,
+    });
 
-//     if (Array.isArray(products)) {
-//       res.status(200).json(products);
-//     } else {
-//       throw new Error("Invalid JSON format: Data must be an array");
-//     }
-//   } catch (error) {
-//     console.error("Error loading products:", error.message);
-//     res.status(500).json({ error: "Failed to load products" });
-//   }
-// }
+    const products = parsedData.data;
+    console.log(products)
+    // Validate each product
+    const invalidRows = [];
+    const validProducts = [];
+
+    for (const [index, product] of products.entries()) {
+      const { productId, productName, totalStock, pricePerUnit } = product;
+
+      // Validation
+      if (!productId || !productName || !totalStock || !pricePerUnit) {
+        invalidRows.push({ row: index + 2, error: "Missing required fields" });
+        continue;
+      }
+
+      // Push valid product with admin's companyName
+      validProducts.push({
+        companyName: admin.companyName,
+        productId,
+        productName,
+        totalStock: parseInt(totalStock),
+        pricePerUnit: parseFloat(pricePerUnit),
+      });
+    }
+
+    // Save valid products to the database
+    const savedProducts = await Products.insertMany(validProducts, { ordered: false });
+
+    // Delete the temporary file
+    fs.unlinkSync(file.path);
+
+    res.status(201).send({
+      success: true,
+      message: "CSV processed successfully",
+      savedProducts,
+      invalidRows,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Handle duplicate productId errors
+      return res.status(400).send({
+        success: false,
+        message: "Duplicate product IDs found in the CSV file",
+        error,
+      });
+    }
+    console.error("Error processing CSV file:", error);
+    res.status(500).send({
+      success: false,
+      message: "Error processing CSV file",
+      error,
+    });
+  }
+  finally{
+    console.log("Exited")
+  }
+};

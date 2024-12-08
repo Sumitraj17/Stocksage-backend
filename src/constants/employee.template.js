@@ -1,9 +1,9 @@
-const employeeTemplate = (employeeName, employeeEmail,employeePassword) => {
+const employeeTemplate = (employeeName, employeeEmail,employeePassword,companyName) => {
   let text = `Dear ${employeeName},
 
 Welcome to StockSage!
 
-You have been successfully registered as an employee. Here are your login credentials:
+You have been successfully registered as an employee by ${companyName}. Here are your login credentials:
 
 Username: ${employeeName}
 UserEmail:${employeeEmail}

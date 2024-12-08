@@ -10,17 +10,16 @@ import {
   getAllEmployees,
   // getEmployeesFromFile,
 } from "../controller/adminController.js";
-import { validateUser } from "../middleware/validator.middleware.js";
+import { validateUser,validateEmployee } from "../middleware/validator.middleware.js";
 
 const router = Router();
 
 router.route("/register").post(adminRegister);
 router.route("/login").post(adminLogin);
-router.route("/logout").post(validateUser, adminLogout);
-router.route("/changePassword").post(validateUser, changePassword);
-router.route("/addEmployee").post(addEmployee);
-router.route("/getAllEmployees").get(getAllEmployees);
-router.route("/updateEmployee/:EmployeeEmail").put(updateEmployee);
-router.route("/deleteEmployee/:EmployeeEmail").delete(deleteEmployee);
-// router.get("/getEmployees", getEmployeesFromFile);
+router.route("/logout").get(validateEmployee, adminLogout);
+router.route("/changePassword").post(validateEmployee, changePassword);
+router.route("/addEmployee").post(validateEmployee,addEmployee);
+router.route("/getAllEmployees").get(validateEmployee,getAllEmployees);
+router.route("/updateEmployee/:EmployeeEmail").put(validateEmployee,updateEmployee);
+router.route("/deleteEmployee/:EmployeeEmail").delete(validateEmployee,deleteEmployee);
 export default router;
