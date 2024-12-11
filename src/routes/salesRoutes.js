@@ -2,7 +2,7 @@ import { Router } from "express";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
-import { createSaleController,getAllSalesDetails,forecasting } from "../controller/salesController.js"; // Your controller to process the CSV file
+import { createSaleController,getAllSalesDetails,forecasting,updatedcreateSaleController } from "../controller/salesController.js"; // Your controller to process the CSV file
 import {validateEmployee} from "../middleware/validator.middleware.js"
 import { highlights,productDetails } from "../controller/dashboardController.js";
 const router = Router();
@@ -43,6 +43,9 @@ router
   .route("/create-sale")
   .post(upload.single("file"),validateEmployee, createSaleController); // Adjust as per your controller
 
+  router
+  .route("/create-csv-sales")
+  .post(upload.single("file"),validateEmployee, updatedcreateSaleController);
 
 router.route("/getAllDetails").get(validateEmployee,getAllSalesDetails);
 

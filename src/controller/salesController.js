@@ -130,6 +130,131 @@ export const createSaleController = async (req, res) => {
   }
 };
 
+export const updatedcreateSaleController = async (req, res) => {
+  try {
+    // Check if a file was uploaded
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, error: "CSV file is required" });
+    }
+
+    const csvFilePath = req.file.path;
+    console.log("Uploaded CSV File Path:", csvFilePath);
+
+    const salesData = new Map(); // To aggregate data by product and month
+
+    // Read and parse the CSV file
+    fs.createReadStream(csvFilePath)
+      .pipe(csv()) // Parse CSV file into JSON objects
+      .on("data", (row) => {
+        try {
+          // Extract and validate fields from the row
+          const {
+            id,
+            date,
+            item, // Assuming this is the ProductID in the CSV
+            unitSold,
+            sales,
+            product_name,
+          } = row;
+
+          // Validate required fields
+          if (!date || !item || !unitSold || !sales) {
+            return; // Skip invalid rows
+          }
+
+          // Parse the date using moment.js for the `DD-MM-YYYY` format
+          const parsedDate = moment(date.trim(), "DD-MM-YYYY", true);
+          if (!parsedDate.isValid()) {
+            console.warn(`Invalid date format in row: ${JSON.stringify(row)}`);
+            return; // Skip rows with invalid dates
+          }
+
+          // Extract the month as `YYYY-MM`
+          const month = parsedDate.format("YYYY-MM");
+
+          // Prepare the key for grouping
+          const key = `${item.trim()}_${month}`;
+
+          // Aggregate data
+          if (!salesData.has(key)) {
+            salesData.set(key, {
+              productId: item.trim(),
+              productName: product_name?.trim() || null,
+              unitsSold: parseInt(unitSold.trim(), 10), // Fix field name here
+              sales: parseInt(sales.trim(), 10),
+              month,
+              companyName: req.user?.companyName || "Default Company", // Default value for company
+              filePath: csvFilePath,
+            });
+          } else {
+            const existingData = salesData.get(key);
+            existingData.unitsSold += parseInt(unitSold.trim(), 10); // Fix field name here
+            existingData.sales += parseInt(sales.trim(), 10);
+            salesData.set(key, existingData);
+          }
+        } catch (rowError) {
+          console.error("Error processing row:", row, rowError);
+        }
+      })
+      .on("end", async () => {
+        try {
+          // Prepare final aggregated data
+          const aggregatedSalesData = Array.from(salesData.values());
+
+          // Insert all valid aggregated sales data into MongoDB
+          const savedRecords = await Sales.insertMany(aggregatedSalesData);
+
+          // Cleanup: Delete the uploaded CSV file
+          // fs.unlinkSync(csvFilePath);
+
+          res.status(201).json({
+            success: true,
+            message: "Sales records processed successfully",
+            records: savedRecords,
+          });
+        } catch (dbError) {
+          console.error("Error saving data to MongoDB:", dbError);
+
+          // Cleanup: Delete the uploaded CSV file
+          fs.unlinkSync(csvFilePath);
+
+          res.status(500).json({
+            success: false,
+            error: dbError.message,
+            message: "Failed to save sales data to MongoDB",
+          });
+        }
+      })
+      .on("error", (error) => {
+        console.error("Error processing CSV file:", error);
+
+        // Cleanup: Delete the uploaded CSV file
+        fs.unlinkSync(csvFilePath);
+
+        res.status(500).json({
+          success: false,
+          error: error.message,
+          message: "Error processing CSV file",
+        });
+      });
+  } catch (error) {
+    console.error("Error:", error);
+
+    // Cleanup: Remove the uploaded file if an error occurs
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      message: "Error processing request",
+    });
+  }
+};
+
 export const getAllSalesDetails = async (req, res) => {
   try {
     const employee = req.user;
@@ -152,11 +277,12 @@ export const forecasting = async (req, res) => {
 
     // Check if a file is uploaded (new data) or if the old file is to be used
     let filePath = null;
-
+    console.log(req.file)
     if (req.file) {
       // If a new file is uploaded, save it and use its path
       const uploadedFile = req.file; // Assume the file is available in req.file (from multer)
       filePath = uploadedFile.path;
+      console.log(filePath)
     } else {
       // If no file is uploaded, fetch the file path from the database (old data)
       const salesRecord = await Sales.findOne({ companyName: company });
@@ -214,10 +340,11 @@ const generateReport = async (jsonData) => {
     const tableData = jsonData.map(row => [
       row.productId || '',
       row.productName || '',
-      row.total_predicted_unit || '',
+      parseInt(row.unitSold) || 0,  // Ensure unitSold is an integer (fallback to 0 if not a valid number)
       row.month || '',
       row.store_with_highest_unit_sold_prediction || ''
     ]);
+    
     doc.autoTable({
       head: [['Product ID', 'Product Name', 'Predicted Units', 'Month', 'Store with Highest Units']],
       body: tableData,
@@ -257,7 +384,7 @@ const generateChart = async (jsonData, chartType = 'bar') => {
     datasets: [
       {
         label: 'Total Predicted Units',
-        data: sortedData.map((row) => row.total_predicted_unit),
+        data: sortedData.map((row) => row.unitSold),
         backgroundColor: chartType === 'pie'
           ? sortedData.map((_, index) => `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 0.6)`)
           : 'rgba(75, 192, 192, 0.6)',

@@ -20,7 +20,6 @@ const salesSchema = new mongoose.Schema(
     },
     customerId: {
       type: String,
-      required: true,
     },
     unitsSold: {
       type: Number,
@@ -29,8 +28,8 @@ const salesSchema = new mongoose.Schema(
     sales:{
       type:Number
     },
-    date: {
-      type: Date,
+    month: {
+      type: String,
       required: true,
     },
     filePath:{
