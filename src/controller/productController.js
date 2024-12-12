@@ -42,7 +42,7 @@ export const createProductController = async (req, res) => {
 export const updateProductController = async (req, res) => {
   try {
     const { productId } = req.params;
-    const { productName, totalStock, pricePerUnit } = req.body;
+    const { productName, totalStock, pricePerUnit,storeId } = req.body;
 
     switch (true) {
       case !productId:
@@ -56,7 +56,7 @@ export const updateProductController = async (req, res) => {
     }
 
     const updatedProduct = await Products.findOneAndUpdate(
-      { productId },
+      { productId ,storeId},
       { productName, totalStock, pricePerUnit },
       { new: true }
     );
@@ -103,22 +103,72 @@ export const getProductController = async (req, res) => {
 
 export const getAllProductsController = async (req, res) => {
   try {
-    const employee = req.user
-    const products = await Products.find({companyName:employee.companyName});
+    const employee = req.user;  // Get the employee's company name
+    const products = await Products.aggregate([
+      {
+        $match: {
+          companyName: employee.companyName, // Filter by company name
+        },
+      },
+      {
+        $group: {
+          _id: "$productId", // Group by productId to ensure uniqueness
+          productName: { $first: "$productName" }, // Keep the first productName
+          totalStock: { $first: "$totalStock" }, // Keep the first totalStock
+          pricePerUnit: { $first: "$pricePerUnit" }, // Keep the first pricePerUnit
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id from the result
+          productId: "$_id", // Rename _id to productId
+          productName: 1,
+          totalStock: 1,
+          pricePerUnit: 1,
+        },
+      },
+    ]);
+
+    // Fetch all unique stores
+    const stores = await Products.aggregate([
+      {
+        $match: {
+          companyName: employee.companyName, // Filter by company name
+        },
+      },
+      {
+        $group: {
+          _id: "$storeId", // Group by storeId to ensure uniqueness
+          location: { $first: "$location" }, // Keep the first location for each storeId
+        },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id from the result
+          storeId: "$_id", // Rename _id to storeId
+          location: 1,
+        },
+      },
+    ]);
+
+    // Send the response with both the products and stores
     res.status(200).send({
       success: true,
-      message: "Products fetched successfully",
+      message: "Products and stores fetched successfully",
       products,
+      stores,
     });
   } catch (error) {
     console.error(error);
     res.status(500).send({
       success: false,
       error,
-      message: "Error in fetching products",
+      message: "Error in fetching products and stores",
     });
   }
 };
+
+
 
 export const deleteProductController = async (req, res) => {
   try {
@@ -174,10 +224,11 @@ export const uploadCSVController = async (req, res) => {
     const validProducts = [];
 
     for (const [index, product] of products.entries()) {
-      const { productId, productName, totalStock, pricePerUnit } = product;
+      const { productId, productName, totalStock, pricePerUnit, storeId,location,storeStock
+      } = product;
 
       // Validation
-      if (!productId || !productName || !totalStock || !pricePerUnit) {
+      if (!productId || !productName || !totalStock || !pricePerUnit || !storeId || !storeStock || !location) {
         invalidRows.push({ row: index + 2, error: "Missing required fields" });
         continue;
       }
@@ -189,6 +240,9 @@ export const uploadCSVController = async (req, res) => {
         productName,
         totalStock: parseInt(totalStock),
         pricePerUnit: parseFloat(pricePerUnit),
+        storeId,
+        location,
+        storeStock
       });
     }
 
@@ -224,3 +278,25 @@ export const uploadCSVController = async (req, res) => {
     console.log("Exited")
   }
 };
+
+
+export const fetchStoreStock = async(req,res)=>{
+  try{
+    const employee = req.user;
+    const {location} = req.body;
+    const products = await Products.find({
+      companyName:employee.companyName,
+      location:location
+    }).select("productId productName storeStock location storeId pricePerUnit");
+
+    return res.status(200).json({
+      status:"Success",
+      message:"Fetch Successful",
+      products
+    })
+  }
+  catch(error){
+    console.log(error)
+    return res.status(500).json({status:"Internal Server Error",message:"Something went wrong"});
+  }
+}

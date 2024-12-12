@@ -5,7 +5,7 @@ import {
   deleteProductController,
   getAllProductsController,
   getProductController,
-  // getProductsFromFile,
+  fetchStoreStock,
   updateProductController,
   uploadCSVController
 } from "../controller/productController.js";
@@ -24,6 +24,8 @@ router.route("/getProduct/:productId").get(getProductController);
 router.route("/getAllProducts").get(validateEmployee,getAllProductsController);
 
 router.route("/deleteProduct/:productId").delete(validateEmployee ,deleteProductController);
+
+router.route("/fetchStoreStock").post(validateEmployee,fetchStoreStock)
 
 const upload = multer({ dest: "uploads/" }); // Adjust destination as needed
 
