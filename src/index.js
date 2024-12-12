@@ -6,6 +6,7 @@ import productRoutes from "./routes/productRoutes.js";
 import salesRoutes from "./routes/salesRoutes.js";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import forecast from "./routes/forecastRouter.js";
 import multer from 'multer'
 config();
 
@@ -26,6 +27,7 @@ app.use(cookieParser());
 app.use("/admin", router);
 app.use("/api/v1/product", productRoutes);
 app.use("/api/v1/sales", salesRoutes);
+app.use("/api/v1/forecast",forecast)
 
 app.get("/", (req, res) => {
   res.send("Server working successfully");

@@ -8,12 +8,11 @@ import axios from "axios";
 import { ChartJSNodeCanvas } from "chartjs-node-canvas";
 import PDFDocument from "pdfkit";
 import FormData from "form-data";
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-// import fs from 'fs';
-// import path from 'path';
+import { Forecast } from "../models/store.forecast.model.js";
 const __filepath = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filepath);
 export const createSaleController = async (req, res) => {
@@ -165,7 +164,7 @@ export const updatedcreateSaleController = async (req, res) => {
           }
 
           // Parse the date using moment.js for the `DD-MM-YYYY` format
-          const parsedDate = moment(date.trim(), "DD-MM-YYYY", true);
+          const parsedDate = moment(date.trim(), "YYYY-MM-DD", true);
           if (!parsedDate.isValid()) {
             console.warn(`Invalid date format in row: ${JSON.stringify(row)}`);
             return; // Skip rows with invalid dates
@@ -277,12 +276,12 @@ export const forecasting = async (req, res) => {
 
     // Check if a file is uploaded (new data) or if the old file is to be used
     let filePath = null;
-    console.log(req.file)
+    console.log(req.file);
     if (req.file) {
       // If a new file is uploaded, save it and use its path
       const uploadedFile = req.file; // Assume the file is available in req.file (from multer)
       filePath = uploadedFile.path;
-      console.log(filePath)
+      console.log(filePath);
     } else {
       // If no file is uploaded, fetch the file path from the database (old data)
       const salesRecord = await Sales.findOne({ companyName: company });
@@ -310,71 +309,110 @@ export const forecasting = async (req, res) => {
         },
       }
     );
+    // console.log(modelResponse.data.product)
+    const store_data = modelResponse.data.store_aggregated_prediction;
 
+    store_data.forEach((item) => {
+      const forecast = new Forecast({
+        storeId: item.store,
+        productId: item.item,
+        product_name: item.product_name,
+        month: item.month,
+        location: item.location,
+        predicted_unit: item.total_unitSold,
+        companyName:company
+      });
+      // Save the forecast object, e.g., to a database
+      forecast
+        .save()
+        .then(() => {
+          // console.log(`Forecast for ${item.product_name} saved successfully.`);
+        })
+        .catch((err) => {
+          console.error(`Error saving forecast for ${item.product_name}:`, err);
+        });
+    });
     // Generate report using the model's response (JSON data)
-    const reportFilePath = await generateReport(modelResponse.data);
+    const reportFilePath = await generateReport(modelResponse.data.product);
 
     // Read the saved PDF file as a buffer
     const reportBuffer = fs.readFileSync(reportFilePath);
 
     // Send the generated report to frontend as PDF
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=forecasting_report.pdf');
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      "attachment; filename=forecasting_report.pdf"
+    );
     res.send(reportBuffer); // Use res.send to send a buffer as response
-
   } catch (error) {
     console.error("Error during forecasting:", error.message);
     res.status(500).json({ error: "Error processing the data" });
   }
 };
 
-
-
 const generateReport = async (jsonData) => {
   try {
     const doc = new jsPDF();
     doc.setFontSize(20);
-    doc.text('Prediction Report', 105, 20, { align: 'center' });
+    doc.text("Prediction Report", 105, 20, { align: "center" });
 
     // Add table
-    const tableData = jsonData.map(row => [
-      row.productId || '',
-      row.productName || '',
-      parseInt(row.unitSold) || 0,  // Ensure unitSold is an integer (fallback to 0 if not a valid number)
-      row.month || '',
-      row.store_with_highest_unit_sold_prediction || ''
+    const tableData = jsonData.map((row) => [
+      row.productId || "",
+      row.productName || "",
+      parseInt(row.total_predicted_unit) || 0, // Ensure unitSold is an integer (fallback to 0 if not a valid number)
+      row.month || "",
+      row.store_with_highest_unit_sold_prediction || "",
     ]);
-    
+
     doc.autoTable({
-      head: [['Product ID', 'Product Name', 'Predicted Units', 'Month', 'Store with Highest Units']],
+      head: [
+        [
+          "Product ID",
+          "Product Name",
+          "Predicted Units",
+          "Month",
+          "Store with Highest Units",
+        ],
+      ],
       body: tableData,
       startY: 30,
     });
 
     // Add bar chart
-    const barChartBuffer = await generateChart(jsonData, 'bar');
-    const base64BarChart = barChartBuffer.toString('base64');
-    doc.addImage(base64BarChart, 'PNG', 10, doc.autoTable.previous.finalY + 10, 180, 100);
+    const barChartBuffer = await generateChart(jsonData, "bar");
+    const base64BarChart = barChartBuffer.toString("base64");
+    doc.addImage(
+      base64BarChart,
+      "PNG",
+      10,
+      doc.autoTable.previous.finalY + 10,
+      180,
+      100
+    );
 
     // Define file path for saving the PDF report
-    const filePath = path.join(__dirname, 'reports', 'forecasting_report.pdf');
-    
+    const filePath = path.join(__dirname, "reports", "forecasting_report.pdf");
+
     // Save the PDF as a file
     doc.save(filePath);
 
     // Return the file path where the PDF is saved
     return filePath;
   } catch (err) {
-    console.error('Error generating report:', err);
+    console.error("Error generating report:", err);
     throw err; // Re-throw the error to be caught in the calling function
   }
 };
 
-const generateChart = async (jsonData, chartType = 'bar') => {
+const generateChart = async (jsonData, chartType = "bar") => {
   const chartJS = new ChartJSNodeCanvas({ width: 600, height: 400 });
 
   // Sort the data by 'total_predicted_unit' in descending order and take the top 10
-  const sortedData = jsonData.sort((a, b) => b.total_predicted_unit - a.total_predicted_unit).slice(0, 10);
+  const sortedData = jsonData
+    .sort((a, b) => b.total_predicted_unit - a.total_predicted_unit)
+    .slice(0, 10);
 
   // console.log(`Generating ${chartType} chart with data:`, sortedData);
 
@@ -383,21 +421,37 @@ const generateChart = async (jsonData, chartType = 'bar') => {
     labels: sortedData.map((row) => row.productName),
     datasets: [
       {
-        label: 'Total Predicted Units',
-        data: sortedData.map((row) => row.unitSold),
-        backgroundColor: chartType === 'pie'
-          ? sortedData.map((_, index) => `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 0.6)`)
-          : 'rgba(75, 192, 192, 0.6)',
-        borderColor: chartType === 'pie'
-          ? sortedData.map((_, index) => `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 1)`)
-          : 'rgba(75, 192, 192, 1)',
+        label: "Total Predicted Units",
+        data: sortedData.map((row) => row.total_predicted_unit),
+        backgroundColor:
+          chartType === "pie"
+            ? sortedData.map(
+                (_, index) =>
+                  `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 0.6)`
+              )
+            : "rgba(75, 192, 192, 0.6)",
+        borderColor:
+          chartType === "pie"
+            ? sortedData.map(
+                (_, index) =>
+                  `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 1)`
+              )
+            : "rgba(75, 192, 192, 1)",
         borderWidth: 1,
-        hoverBackgroundColor: chartType === 'pie'
-          ? sortedData.map((_, index) => `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 0.8)`)
-          : 'rgba(75, 192, 192, 0.8)',
-        hoverBorderColor: chartType === 'pie'
-          ? sortedData.map((_, index) => `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 1)`)
-          : 'rgba(75, 192, 192, 1)',
+        hoverBackgroundColor:
+          chartType === "pie"
+            ? sortedData.map(
+                (_, index) =>
+                  `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 0.8)`
+              )
+            : "rgba(75, 192, 192, 0.8)",
+        hoverBorderColor:
+          chartType === "pie"
+            ? sortedData.map(
+                (_, index) =>
+                  `rgba(${(index * 50) % 255}, ${(index * 70) % 255}, 192, 1)`
+              )
+            : "rgba(75, 192, 192, 1)",
       },
     ],
   };
@@ -408,28 +462,31 @@ const generateChart = async (jsonData, chartType = 'bar') => {
     data: chartData,
     options: {
       responsive: true,
-      scales: chartType !== 'pie' ? {
-        x: {
-          beginAtZero: true,
-          ticks: {
-            autoSkip: false,
-            maxRotation: 45,
-            minRotation: 45,
-          },
-        },
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 200,
-          },
-          grid: {
-            color: 'rgba(0, 0, 0, 0.1)',
-          },
-        },
-      } : undefined,
+      scales:
+        chartType !== "pie"
+          ? {
+              x: {
+                beginAtZero: true,
+                ticks: {
+                  autoSkip: false,
+                  maxRotation: 45,
+                  minRotation: 45,
+                },
+              },
+              y: {
+                beginAtZero: true,
+                ticks: {
+                  stepSize: 200,
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.1)",
+                },
+              },
+            }
+          : undefined,
       plugins: {
         legend: {
-          position: 'top',
+          position: "top",
         },
         tooltip: {
           callbacks: {
@@ -446,402 +503,6 @@ const generateChart = async (jsonData, chartType = 'bar') => {
   return await chartJS.renderToBuffer(chartConfig);
 };
 
-// // Function to generate chart
-// const generateChart = async (jsonData) => {
-//   const chartJS = new ChartJSNodeCanvas({ width: 600, height: 400 });
+// get based on store
 
-//   // Sort the data by 'total_predicted_unit' in descending order and take the top 10
-//   const sortedData = jsonData.sort((a, b) => b.total_predicted_unit - a.total_predicted_unit).slice(0, 10);
-
-//   // Extract chart data for the top 10 highest predicted units sold
-//   const chartData = {
-//     labels: sortedData.map((row) => row.productName), // Use product names as X-axis labels
-//     datasets: [
-//       {
-//         label: 'Total Predicted Units',
-//         data: sortedData.map((row) => row.total_predicted_unit),
-//         backgroundColor: 'rgba(75, 192, 192, 0.6)',
-//         borderColor: 'rgba(75, 192, 192, 1)',
-//         borderWidth: 1,
-//         hoverBackgroundColor: 'rgba(75, 192, 192, 0.8)',
-//         hoverBorderColor: 'rgba(75, 192, 192, 1)',
-//       },
-//     ],
-//   };
-
-//   // Chart configuration
-//   const chartConfig = {
-//     type: 'bar',
-//     data: chartData,
-//     options: {
-//       responsive: true,
-//       scales: {
-//         x: {
-//           beginAtZero: true,
-//           ticks: {
-//             autoSkip: false,
-//             maxRotation: 45,
-//             minRotation: 45,
-//           },
-//         },
-//         y: {
-//           beginAtZero: true,
-//           ticks: {
-//             stepSize: 200,
-//           },
-//           grid: {
-//             color: 'rgba(0, 0, 0, 0.1)',
-//           },
-//         },
-//       },
-//       plugins: {
-//         legend: {
-//           position: 'top',
-//         },
-//         tooltip: {
-//           callbacks: {
-//             label: function (context) {
-//               return `Units: ${context.raw}`;
-//             },
-//           },
-//         },
-//       },
-//     },
-//   };
-
-//   // Render and return the chart as a buffer
-//   return await chartJS.renderToBuffer(chartConfig);
-// };
-
-// // Generate a report from the JSON data
-// const generateReport = async (jsonData) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const doc = new PDFDocument();
-//       const chunks = [];
-//       const passThroughStream = new PassThrough(); // Create a writable stream to accumulate PDF data
-
-//       // Pipe the document to the PassThrough stream
-//       doc.pipe(passThroughStream);
-
-//       // Collect the PDF data in chunks
-//       passThroughStream.on('data', (chunk) => chunks.push(chunk));
-//       passThroughStream.on('end', () => resolve(Buffer.concat(chunks)));
-
-//       // Add title
-//       doc.fontSize(20).text('CSV Data Report', { align: 'center' });
-//       doc.moveDown(2);
-
-//       // Table Headers
-//       const tableHeaders = ['Product ID', 'Product Name', 'Predicted Units', 'Month', 'Store with Highest Units'];
-
-//       // Column widths and row height
-//       const columnWidths = [70, 180, 120, 100, 150];
-//       const rowHeight = 18;
-//       const fontSize = 10;
-
-//       // Draw header row
-//       let currentX = 50;
-//       doc.fontSize(fontSize).font('Helvetica-Bold');
-//       tableHeaders.forEach((header, index) => {
-//         doc.rect(currentX, doc.y, columnWidths[index], rowHeight).stroke();
-//         doc.text(header, currentX + 5, doc.y + 5); // Add text inside the header cell with padding
-//         currentX += columnWidths[index]; // Move to the next column
-//       });
-//       doc.moveDown();
-
-//       // Add data rows with borders
-//       doc.fontSize(fontSize).font('Helvetica');
-//       jsonData.forEach((row) => {
-//         currentX = 50;
-//         tableHeaders.forEach((header, index) => {
-//           // Manually map headers to the correct field in the data
-//           let value;
-//           switch (header) {
-//             case 'Product ID':
-//               value = row.productId;
-//               break;
-//             case 'Product Name':
-//               value = row.productName;
-//               break;
-//             case 'Predicted Units':
-//               value = row.total_predicted_unit;
-//               break;
-//             case 'Month':
-//               value = row.month;
-//               break;
-//             case 'Store with Highest Units':
-//               value = row.store_with_highest_unit_sold_prediction;
-//               break;
-//             default:
-//               value = '';
-//           }
-
-//           // If value is undefined or null, use an empty string
-//           const cellValue = value ? value : '';
-
-//           // Draw each cell border
-//           doc.rect(currentX, doc.y, columnWidths[index], rowHeight).stroke();
-//           doc.text(cellValue, currentX + 5, doc.y + 5); // Add text inside the cell with padding
-//           currentX += columnWidths[index]; // Move to the next column
-//         });
-//         doc.moveDown();
-//       });
-
-//       // Add chart
-//       generateChart(jsonData)
-//         .then((chartBuffer) => {
-//           doc.addPage();
-//           doc.image(chartBuffer, { width: 500, align: 'center' });
-
-//           // Finalize the PDF document
-//           doc.end();
-//         })
-//         .catch((err) => reject(err));
-
-//     } catch (err) {
-//       reject(err);
-//     }
-//   });
-// };
-
-
-// // Function to generate chart
-// const generateChart = async (jsonData) => {
-//   const chartJS = new ChartJSNodeCanvas({ width: 600, height: 400 });
-
-//   // Sort the data by 'total_predicted_unit' in descending order and take the top 10
-//   const sortedData = jsonData
-//     .sort((a, b) => b.total_predicted_unit - a.total_predicted_unit)
-//     .slice(0, 10);
-
-//   // Extract chart data for the top 10 highest predicted units sold
-//   const chartData = {
-//     labels: sortedData.map((row) => row.productName), // Use product names as X-axis labels
-//     datasets: [
-//       {
-//         label: "Total Predicted Units",
-//         data: sortedData.map((row) => row.total_predicted_unit),
-//         backgroundColor: "rgba(75, 192, 192, 0.6)",
-//         borderColor: "rgba(75, 192, 192, 1)",
-//         borderWidth: 1,
-//         hoverBackgroundColor: "rgba(75, 192, 192, 0.8)",
-//         hoverBorderColor: "rgba(75, 192, 192, 1)",
-//       },
-//     ],
-//   };
-
-//   // Chart configuration
-//   const chartConfig = {
-//     type: "bar",
-//     data: chartData,
-//     options: {
-//       responsive: true,
-//       scales: {
-//         x: {
-//           beginAtZero: true,
-//           ticks: {
-//             autoSkip: false,
-//             maxRotation: 45,
-//             minRotation: 45,
-//           },
-//         },
-//         y: {
-//           beginAtZero: true,
-//           ticks: {
-//             stepSize: 200,
-//           },
-//           grid: {
-//             color: "rgba(0, 0, 0, 0.1)",
-//           },
-//         },
-//       },
-//       plugins: {
-//         legend: {
-//           position: "top",
-//         },
-//         tooltip: {
-//           callbacks: {
-//             label: function (context) {
-//               return `Units: ${context.raw}`;
-//             },
-//           },
-//         },
-//       },
-//     },
-//   };
-
-//   // Render and return the chart as a buffer
-//   return await chartJS.renderToBuffer(chartConfig);
-// };
-
-// // Generate a report from the JSON data
-// const generateReport = async (jsonData) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const doc = new PDFDocument();
-//       const chunks = [];
-//       const passThroughStream = new PassThrough(); // Create a writable stream to accumulate PDF data
-
-//       // Pipe the document to the PassThrough stream
-//       doc.pipe(passThroughStream);
-
-//       // Collect the PDF data in chunks
-//       passThroughStream.on("data", (chunk) => chunks.push(chunk));
-//       passThroughStream.on("end", () => resolve(Buffer.concat(chunks)));
-
-//       // Add title
-//       doc.fontSize(20).text("CSV Data Report", { align: "center" });
-//       doc.moveDown(2);
-
-//       // Table Headers
-//       const tableHeaders = [
-//         "Product ID",
-//         "Product Name",
-//         "Predicted Units",
-//         "Month",
-//         "Store with Highest Units",
-//       ];
-
-//       // Column widths and row height
-//       const columnWidths = [70, 180, 120, 100, 150];
-//       const rowHeight = 20;
-
-//       // Draw header row
-//       let currentX = 50;
-//       tableHeaders.forEach((header, index) => {
-//         doc.rect(currentX, doc.y, columnWidths[index], rowHeight).stroke();
-//         doc.text(header, currentX + 5, doc.y + 5); // Add text inside the header cell with padding
-//         currentX += columnWidths[index]; // Move to the next column
-//       });
-//       doc.moveDown();
-
-//       // Add data rows with borders
-//       jsonData.forEach((row) => {
-//         currentX = 50;
-//         tableHeaders.forEach((header, index) => {
-//           // Manually map headers to the correct field in the data
-//           let value;
-//           switch (header) {
-//             case "Product ID":
-//               value = row.productId;
-//               break;
-//             case "Product Name":
-//               value = row.productName;
-//               break;
-//             case "Predicted Units":
-//               value = row.total_predicted_unit;
-//               break;
-//             case "Month":
-//               value = row.month;
-//               break;
-//             case "Store with Highest Units":
-//               value = row.store_with_highest_unit_sold_prediction;
-//               break;
-//             default:
-//               value = "";
-//           }
-
-//           // If value is undefined or null, use an empty string
-//           const cellValue = value ? value : "";
-
-//           // Draw each cell border
-//           doc.rect(currentX, doc.y, columnWidths[index], rowHeight).stroke();
-//           doc.text(cellValue, currentX + 5, doc.y + 5); // Add text inside the cell with padding
-//           currentX += columnWidths[index]; // Move to the next column
-//         });
-//         doc.moveDown();
-//       });
-
-//       // Add chart
-//       generateChart(jsonData)
-//         .then((chartBuffer) => {
-//           doc.addPage();
-//           doc.image(chartBuffer, { width: 500, align: "center" });
-
-//           // Finalize the PDF document
-//           doc.end();
-//         })
-//         .catch((err) => reject(err));
-//     } catch (err) {
-//       reject(err);
-//     }
-//   });
-// };
-// // Generate chart from the JSON data
-// const generateChart = async (jsonData) => {
-//   const chartJS = new ChartJSNodeCanvas({ width: 600, height: 400 });
-
-//   // Extract chart data - using total_predicted_unit for visualization
-//   const chartData = {
-//     labels: jsonData.map((row) => row.productName), // Use product names as X-axis labels
-//     datasets: [
-//       {
-//         label: 'Total Predicted Units',
-//         data: jsonData.map((row) => row.total_predicted_unit),
-//         backgroundColor: 'rgba(75, 192, 192, 0.6)', // Chart color
-//         borderColor: 'rgba(75, 192, 192, 1)',
-//         borderWidth: 1,
-//       },
-//     ],
-//   };
-
-//   // Chart configuration
-//   const chartConfig = {
-//     type: 'bar', // Bar chart type
-//     data: chartData,
-//     options: {
-//       responsive: true,
-//       scales: {
-//         x: { beginAtZero: true },
-//         y: { beginAtZero: true },
-//       },
-//     },
-//   };
-
-//   // Render and return the chart as a buffer
-//   return await chartJS.renderToBuffer(chartConfig);
-// };
-
-// // Generate a report from the JSON data
-// const generateReport = async (jsonData) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       const doc = new PDFDocument();
-//       const chunks = [];
-//       const passThroughStream = new PassThrough(); // Create a writable stream to accumulate PDF data
-
-//       // Pipe the document to the PassThrough stream
-//       doc.pipe(passThroughStream);
-
-//       // Collect the PDF data in chunks
-//       passThroughStream.on('data', (chunk) => chunks.push(chunk));
-//       passThroughStream.on('end', () => resolve(Buffer.concat(chunks)));
-
-//       // Add title
-//       doc.fontSize(20).text('CSV Data Report', { align: 'center' });
-
-//       // Add table
-//       doc.fontSize(12).text('Data Table:', { underline: true });
-//       doc.moveDown();
-//       jsonData.forEach((row) => {
-//         const rowText = `${row.productId} | ${row.productName} | ${row.total_predicted_unit} | ${row.month} | Store ${row.store_with_highest_unit_sold_prediction}`;
-//         doc.text(rowText);
-//       });
-
-//       // Add chart
-//       generateChart(jsonData)
-//         .then((chartBuffer) => {
-//           doc.addPage();
-//           doc.image(chartBuffer, { width: 500, align: 'center' });
-
-//           // Finalize the PDF document
-//           doc.end();
-//         })
-//         .catch((err) => reject(err));
-
-//     } catch (err) {
-//       reject(err);
-//     }
-//   });
-// };
+const getStoreForecast = async (req, res) => {};
